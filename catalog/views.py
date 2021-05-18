@@ -1,6 +1,8 @@
 from django.shortcuts import render
+from django.views import generic
 
 from catalog.models import Book, Author, BookInstance, Genre
+
 
 # Create your views here.
 
@@ -34,3 +36,25 @@ def index(request):
         context=context
         
     )
+
+
+class BookListView(generic.ListView):
+    """
+    Generic class-based view for a list of books.
+    """
+    model = Book
+        
+    # context_object_name = 'my_book_list' #your own name for the list as a template variable
+    # queryset = Book.objects.filter(title__icontains='war')[:5] #get 5 books containing the title war
+    # template_name = 'books/my_arbitrary_template_name_list.html' #Specify your own template name/location
+    
+    # def get_context_data(self, **kwargs):
+    #     #call the base implementation first to get the def get_context_data(self, **kwargs):
+    #     context = super(BookListView,self).get_context_data(**kwargs)
+    #     #create any data and add it to the context
+    #     context['some_data'] = 'this is just some data'
+        
+    #     return context
+        
+        
+        
