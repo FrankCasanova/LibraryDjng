@@ -60,7 +60,7 @@ class Book(models.Model):
         
     #ManyToManyField used because genre can contain many books, Books can cover many genres.
     #Gener class has already been defined so we can specify the object above.
-    gener = models.ManyToManyField(
+    genre = models.ManyToManyField( #u cant display this on model.admins.
         Genre,
         help_text='Select a genre for this book'
     )
@@ -82,6 +82,15 @@ class Book(models.Model):
         Returns the url to access a detail record for this book
         """
         return reverse("book-detail", args=[str(self.id)])
+    
+    def display_genre(self):
+        """
+        Create a string for the Genre. This is required to display genre in Admin.
+        """
+        
+        return ', '.join(genre.name for genre in self.genre.all()[:3])
+    
+    display_genre.short_description = 'Genre'
 #-----------------------------------------------------------------------------------------------    
     
     
@@ -148,7 +157,7 @@ class Author(models.Model):
         max_length=100
     )
     
-    date_of_bird = models.DateField(
+    date_of_birth = models.DateField(
         null=True,
         blank=True
     )    
