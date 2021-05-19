@@ -2,6 +2,8 @@ from django.db import models
 from django.db.models.base import Model
 from django.urls import reverse
 import uuid #required for unique book instances 
+from django.contrib.auth.models import User
+from datetime import date
 
 # Create your models here.
 
@@ -133,8 +135,11 @@ class BookInstance(models.Model):
         help_text='Book aviability'
     )
     
+    borrower = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
+    
     class Meta:
         ordering = ['due_back']
+        permissions = (('can_mark_returned', 'Set Book as returned'),)
     
     def __str__(self):
         """
@@ -142,6 +147,12 @@ class BookInstance(models.Model):
         """     
         
         return f'{self.id} ({self.book.title})'
+    
+    @property
+    def is_overdue(self):
+         
+        return self.due_back and date.today() > self.due_back #yes whether a loaned book is overdue
+        
 #---------------------------------------------------------------------------------------------    
 
 class Author(models.Model):
@@ -180,4 +191,6 @@ class Author(models.Model):
     
     def __str__(self):
         return f'{self.last_name}, {self.first_name}'
+
+    
     
