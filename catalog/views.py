@@ -1,7 +1,9 @@
 from django.shortcuts import render
 from django.views import generic
 
+
 from catalog.models import Book, Author, BookInstance, Genre
+
 
 
 # Create your views here.
@@ -21,11 +23,17 @@ def index(request):
     #The 'all()' is implied by default.
     num_authors = Author.objects.count()
     
+    #Number of view, as counted in the session variable.
+    num_visits = request.session.get('num_visits', 1)
+    request.session['num_visists'] = num_visits+1
+    
+    
     context = {
         'num_books': num_books,
         'num_instances': num_instances,
         'num_instances_aviable': num_isntances_aviables,
         'num_authors': num_authors,
+        'num_visits': num_visits,
     }
     
     #Render the HTML template index.html with the data in the context variable
