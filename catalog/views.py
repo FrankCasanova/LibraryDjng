@@ -12,7 +12,7 @@ from django.contrib.auth.mixins import PermissionRequiredMixin
 
 
 from catalog.models import Book, Author, BookInstance, Genre
-from catalog.forms import RenewBookModelForm
+from catalog.forms import RenewBookForm
 
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.urls import reverse_lazy
@@ -131,7 +131,7 @@ def renew_book_librarian(request, pk):
     if request.method == 'POST':
 
         # Create a form instance and populate it with data from the request (binding):
-        form = RenewBookModelForm(request.POST)
+        form = RenewBookForm(request.POST)
 
         # Check if the form is valid:
         if form.is_valid():
@@ -145,7 +145,7 @@ def renew_book_librarian(request, pk):
     # If this is a GET (or any other method) create the default form.
     else:
         proposed_renewal_date = datetime.date.today() + datetime.timedelta(weeks=3)
-        form = RenewBookModelForm(initial={'renewal_date': proposed_renewal_date})
+        form = RenewBookForm(initial={'renewal_date': proposed_renewal_date})
 
     context = {
         'form': form,
@@ -154,19 +154,24 @@ def renew_book_librarian(request, pk):
 
     return render(request, 'catalog/book_renew_librarian.html', context)    
 
-class AuthorCreate(CreateView):
+class AuthorCreate(PermissionRequiredMixin, CreateView):
     model = Author
     fields = ['first_name', 'last_name', 'date_of_birth', 'date_of_death']
     initial = {'date_of_death': '11/06/2020'}
+    permission_required = 'catalog.can_mark_returned'
 
-class AuthorUpdate(UpdateView):
+
+class AuthorUpdate(PermissionRequiredMixin, UpdateView):
     model = Author
     fields = '__all__' # Not recommended (potential security issue if more fields added)
+    permission_required = 'catalog.can_mark_returned'
 
-class AuthorDelete(DeleteView):
+
+class AuthorDelete(PermissionRequiredMixin, DeleteView):
     model = Author
     success_url = reverse_lazy('authors')
-    
+    permission_required = 'catalog.can_mark_returned'
+
 
 # Classes created for the forms challenge
 class BookCreate(PermissionRequiredMixin, CreateView):
@@ -184,4 +189,6 @@ class BookUpdate(PermissionRequiredMixin, UpdateView):
 class BookDelete(PermissionRequiredMixin, DeleteView):
     model = Book
     success_url = reverse_lazy('books')
-    permission_required = 'catalog.can_mark_returned'    
+    permission_required = 'catalog.can_mark_returned'   
+    
+    
